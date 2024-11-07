@@ -4,7 +4,7 @@ import { Link } from "expo-router";
 
 export default function Index() {
   return (
-    <View style ={{ flex: 1}}>
+    <View style ={styles.container}>
       <BirthdayCard />
     </View>
   );
