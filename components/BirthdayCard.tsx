@@ -10,6 +10,8 @@ const BirthdayCard = () => {
   const [textColor, setTextColor] = useState<string>('black');
   const [titleSize, setTitleSize] = useState<number>(24);
   const [messageSize, setMessageSize] = useState<number>(16);
+  const [titleStyle, setTitleStyle] = useState<'normal' | 'italic' | 'bold'>('normal');
+  const [messageStyle, setMessageStyle] = useState<'normal' | 'italic' | 'bold'>('normal');
 
   useEffect(() => {
     (async () => {
@@ -48,6 +50,14 @@ const BirthdayCard = () => {
     setMessageSize(isNaN(size) ? 16 : size);
   };
 
+  const handleTitleStyleChange = (style: 'normal' | 'italic' | 'bold') => {
+    setTitleStyle(style);
+  };
+
+  const handleMessageStyleChange = (style: 'normal' | 'italic' | 'bold') => {
+    setMessageStyle(style);
+  };
+
   const handleAddImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -70,20 +80,66 @@ const BirthdayCard = () => {
       <View style={styles.card}>
         <View style={styles.titleContainer}>
           <TextInput
-            style={[styles.title, { color: textColor, fontSize: titleSize }]}
+            style={[
+              styles.title,
+              { color: textColor, fontSize: titleSize, fontWeight: titleStyle === 'bold' ? 'bold' : 'normal', fontStyle: titleStyle === 'italic' ? 'italic' : 'normal' }
+            ]}
             value={title}
             onChangeText={handleTitleChange}
             placeholder="Enter title"
           />
+        <View style={styles.titleStyleButtons}>
+            <TouchableOpacity
+              style={[styles.titleStyleButton, titleStyle === 'normal' && styles.activeButton]}
+              onPress={() => handleTitleStyleChange('normal')}
+            >
+              <Text>Normal</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.titleStyleButton, titleStyle === 'italic' && styles.activeButton]}
+              onPress={() => handleTitleStyleChange('italic')}
+            >
+              <Text>Italic</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.titleStyleButton, titleStyle === 'bold' && styles.activeButton]}
+              onPress={() => handleTitleStyleChange('bold')}
+            >
+              <Text>Bold</Text>
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.messageContainer}>
           <TextInput
-            style={[styles.message, { color: textColor, fontSize: messageSize }]}
+            style={[
+              styles.message,
+              { color: textColor, fontSize: messageSize, fontWeight: messageStyle === 'bold' ? 'bold' : 'normal', fontStyle: messageStyle === 'italic' ? 'italic' : 'normal' }
+            ]}
             value={message}
             onChangeText={handleMessageChange}
             placeholder="Enter message"
             multiline
           />
+          <View style={styles.messageStyleButtons}>
+            <TouchableOpacity
+              style={[styles.messageStyleButton, messageStyle === 'normal' && styles.activeButton]}
+              onPress={() => handleMessageStyleChange('normal')}
+            >
+              <Text>Normal</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.messageStyleButton, messageStyle === 'italic' && styles.activeButton]}
+              onPress={() => handleMessageStyleChange('italic')}
+            >
+              <Text>Italic</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.messageStyleButton, messageStyle === 'bold' && styles.activeButton]}
+              onPress={() => handleMessageStyleChange('bold')}
+            >
+              <Text>Bold</Text>
+            </TouchableOpacity>
+          </View>
         </View>
         {imageSource && (
           <Image source={{ uri: '../assets/images/emoji1.png' }} style={styles.image} />
@@ -174,6 +230,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlignVertical: 'top',
     minHeight: 100,
+  },
+  titleStyleButtons: {
+    flexDirection: 'row',
+    marginLeft: 8,
+  },
+  titleStyleButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  messageStyleButtons: {
+    flexDirection: 'row',
+    marginTop: 8,
+  },
+  messageStyleButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  activeButton: {
+    backgroundColor: '#ccc',
   },
   image: {
     width: '100%',
