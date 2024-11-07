@@ -1,50 +1,52 @@
-# Welcome to your Expo app 👋
+# Birthday Card Creator
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Description
+   The Birthday Card Creator is a React Native application that allows users to create custom birthday cards. Users can add and edit text, change the background color and text color, adjust the font size and style, and add images to the card.
+   Features
 
-## Get started
+   - Create a new birthday card from scratch
+   - Add a title and message to the card
+   - Customize the background color and text color
+   - Adjust the font size and style (normal, italic, bold) for the title and message
+   - Upload an image to the card
+   - Preview the completed card
 
-1. Install dependencies
+## Installation
 
-   ```bash
-   npm install
+   - Make sure you have Node.js and npm installed on your system.
+   - Install the Expo CLI globally by running:
+
+   ```
+   npm install -g expo-cli
    ```
 
-2. Start the app
-
-   ```bash
-    npx expo start
+   - Clone the repository to your local machine.
+   ```
+   git clone https://github.com/ComfortN/birthday-Card.git
    ```
 
-In the output, you'll find options to open the app in a
+   - Navigate to the project directory and install the dependencies.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   ```
+   run npm install
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+   - Start the Expo development server by running.
 
-When you're ready, run:
+   ```
+   npx  expo start
+   ```
+   
+   - Use the Expo mobile app or an emulator to run the application.
 
-```bash
-npm run reset-project
-```
+## Usage
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+   - When the app starts, you'll see a blank birthday card.
+   - Tap on the "Title" or "Message" text fields to enter your desired text.
+   - Use the buttons below the text fields to change the font style (normal, italic, bold).
+   - Tap the "Background Color" and "Text Color" inputs to enter your desired colors (e.g., "white", "#FFFFFF").
+   - Adjust the "Title Size" and "Message Size" inputs to change the font size.
+   - Tap the "Add Image" button to upload an image from your device's photo library.
+   - Once you're satisfied with your card, you can save or share it.
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
