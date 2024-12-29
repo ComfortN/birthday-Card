@@ -1,205 +1,245 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  ScrollView,
+  Image,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList, CardData } from '../app/index';
+import { MaterialIcons } from '@expo/vector-icons'; 
 
-const BirthdayCard = () => {
-  const [title, setTitle] = useState<string>('');
-  const [message, setMessage] = useState<string>('');
-  const [backgroundColor, setBackgroundColor] = useState<string>('');
-  const [imageSource, setImageSource] = useState<string | null>(null);
-  const [textColor, setTextColor] = useState<string>('black');
-  const [titleSize, setTitleSize] = useState<number>(24);
-  const [messageSize, setMessageSize] = useState<number>(16);
-  const [titleStyle, setTitleStyle] = useState<'normal' | 'italic' | 'bold'>('normal');
-  const [messageStyle, setMessageStyle] = useState<'normal' | 'italic' | 'bold'>('normal');
+type Props = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'CardMaker'>;
+};
 
-  useEffect(() => {
-    (async () => {
-      if (Platform.OS !== 'web') {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-          alert('Sorry, we need camera roll permissions to make this work!');
-        }
-      }
-    })();
-  }, []);
+const COLORS = ['#FFB6C1', '#87CEEB', '#98FB98', '#DDA0DD', '#F0E68C'];
+const FONT_FAMILIES = ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'];
+const FONT_SIZES = [12, 14, 16, 18, 20, 24, 28];
+const DECORATIONS = ['🎉', '🎂', '🎈', '🎁', '✨'];
 
-  const handleTitleChange = (text: string) => {
-    setTitle(text);
-  };
+const CARD_ASPECT_RATIO = 1.4; // Standard greeting card ratio
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const CARD_WIDTH = SCREEN_WIDTH - 40; // 20px padding on each side
+const CARD_HEIGHT = CARD_WIDTH * CARD_ASPECT_RATIO;
 
-  const handleMessageChange = (text: string) => {
-    setMessage(text);
-  };
+export default function BirthdayCard({ navigation }: Props) {
+  const [cardData, setCardData] = useState<CardData>({
+    recipientName: '',
+    message: '',
+    backgroundColor: '#FFFFFF', // Start with white background
+    fontFamily: FONT_FAMILIES[0],
+    fontSize: FONT_SIZES[2],
+    isBold: false,
+    isItalic: false,
+    isUnderline: false,
+    image: null,
+    decorations: [],
+  });
+  const [loading, setLoading] = useState(false);
 
-  const handleBackgroundColorChange = (color: string) => {
-    setBackgroundColor(color);
-  };
 
-  const handleTextColorChange = (color: string) => {
-    setTextColor(color);
-  };
+  const toggleBold = () => setCardData({ ...cardData, isBold: !cardData.isBold });
+  const toggleItalic = () => setCardData({ ...cardData, isItalic: !cardData.isItalic });
+  const toggleUnderline = () => setCardData({ ...cardData, isUnderline: !cardData.isUnderline });
 
-  const handleTitleSizeChange = (text: string) => {
-    const size = parseInt(text);
-    setTitleSize(isNaN(size) ? 24 : size);
-  };
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
 
-  const handleMessageSizeChange = (text: string) => {
-    const size = parseInt(text);
-    setMessageSize(isNaN(size) ? 16 : size);
-  };
-
-  const handleTitleStyleChange = (style: 'normal' | 'italic' | 'bold') => {
-    setTitleStyle(style);
-  };
-
-  const handleMessageStyleChange = (style: 'normal' | 'italic' | 'bold') => {
-    setMessageStyle(style);
-  };
-
-  const handleAddImage = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        setImageSource(result.uri);
-      }
-    } catch (e) {
-      console.error(e);
+    if (!result.canceled) {
+      setCardData({ ...cardData, image: result.assets[0].uri });
     }
   };
 
+  const addDecoration = (decoration: string) => {
+    setCardData({ ...cardData, decorations: [...cardData.decorations, decoration] });
+  };
+
+  const handlePreview = () => {
+    setLoading(true); // Show loader
+    setTimeout(() => {
+      setLoading(false); // Hide loader
+      navigation.navigate('Preview', { cardData });
+    }, 2000); // Simulate 2 seconds delay
+  };
+
   return (
-    <ScrollView style={[styles.container, { backgroundColor }]}>
-      <View style={styles.card}>
-        <View style={styles.titleContainer}>
-          <TextInput
-            style={[
-              styles.title,
-              { color: textColor, fontSize: titleSize, fontWeight: titleStyle === 'bold' ? 'bold' : 'normal', fontStyle: titleStyle === 'italic' ? 'italic' : 'normal' }
-            ]}
-            value={title}
-            onChangeText={handleTitleChange}
-            placeholder="Enter title"
-          />
-        <View style={styles.titleStyleButtons}>
-            <TouchableOpacity
-              style={[styles.titleStyleButton, titleStyle === 'normal' && styles.activeButton]}
-              onPress={() => handleTitleStyleChange('normal')}
-            >
-              <Text>Normal</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.titleStyleButton, titleStyle === 'italic' && styles.activeButton]}
-              onPress={() => handleTitleStyleChange('italic')}
-            >
-              <Text>Italic</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.titleStyleButton, titleStyle === 'bold' && styles.activeButton]}
-              onPress={() => handleTitleStyleChange('bold')}
-            >
-              <Text>Bold</Text>
-            </TouchableOpacity>
-          </View>
+    <View style={styles.container}>
+      {loading && (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color="#FF69B4" />
         </View>
-        <View style={styles.messageContainer}>
+      )}
+      <ScrollView>
+        <View style={styles.form}>
+          {/* Card Preview */}
+          <View style={styles.cardPreviewContainer}>
+            <View style={[
+              styles.cardPreview,
+              { backgroundColor: cardData.backgroundColor }
+            ]}>
+              {cardData.image && (
+                <Image source={{ uri: cardData.image }} style={styles.cardImage} />
+              )}
+              <Text
+                style={[
+                  styles.previewText,
+                  {
+                    fontFamily: cardData.fontFamily,
+                    fontSize: cardData.fontSize,
+                    fontWeight: cardData.isBold ? 'bold' : 'normal',
+                    fontStyle: cardData.isItalic ? 'italic' : 'normal',
+                    textDecorationLine: cardData.isUnderline ? 'underline' : 'none',
+                  },
+                ]}
+              >
+                {cardData.message || 'Your message will appear here'}
+              </Text>
+              <View style={styles.decorationsContainer}>
+                {cardData.decorations.map((decoration, index) => (
+                  <Text key={index} style={styles.decorationPreview}>{decoration}</Text>
+                ))}
+              </View>
+            </View>
+          </View>
+
           <TextInput
-            style={[
-              styles.message,
-              { color: textColor, fontSize: messageSize, fontWeight: messageStyle === 'bold' ? 'bold' : 'normal', fontStyle: messageStyle === 'italic' ? 'italic' : 'normal' }
-            ]}
-            value={message}
-            onChangeText={handleMessageChange}
-            placeholder="Enter message"
+            style={styles.input}
+            placeholder="Recipient's Name"
+            value={cardData.recipientName}
+            onChangeText={(text) => setCardData({ ...cardData, recipientName: text })}
+          />
+          <TextInput
+            style={[styles.input, styles.messageInput]}
+            placeholder="Write your message..."
+            value={cardData.message}
+            onChangeText={(text) => setCardData({ ...cardData, message: text })}
             multiline
           />
-          <View style={styles.messageStyleButtons}>
-            <TouchableOpacity
-              style={[styles.messageStyleButton, messageStyle === 'normal' && styles.activeButton]}
-              onPress={() => handleMessageStyleChange('normal')}
+          
+          <Picker
+            selectedValue={cardData.fontFamily}
+            onValueChange={(itemValue) => setCardData({ ...cardData, fontFamily: itemValue })}
+            style={styles.picker}
+          >
+            {FONT_FAMILIES.map((font) => (
+              <Picker.Item label={font} value={font} key={font} />
+            ))}
+          </Picker>
+          
+          <Picker
+            selectedValue={cardData.fontSize}
+            onValueChange={(itemValue) => setCardData({ ...cardData, fontSize: itemValue })}
+            style={styles.picker}
+          >
+            {FONT_SIZES.map((size) => (
+              <Picker.Item label={`${size}`} value={size} key={size} />
+            ))}
+          </Picker>
+
+          <View style={styles.formattingOptions}>
+            <TouchableOpacity 
+              style={[styles.formatButton, cardData.isBold && styles.formatButtonActive]} 
+              onPress={toggleBold}
             >
-              <Text>Normal</Text>
+              <Text style={styles.formatButtonText}>B</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.messageStyleButton, messageStyle === 'italic' && styles.activeButton]}
-              onPress={() => handleMessageStyleChange('italic')}
+            <TouchableOpacity 
+              style={[styles.formatButton, cardData.isItalic && styles.formatButtonActive]} 
+              onPress={toggleItalic}
             >
-              <Text>Italic</Text>
+              <Text style={styles.formatButtonText}>I</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.messageStyleButton, messageStyle === 'bold' && styles.activeButton]}
-              onPress={() => handleMessageStyleChange('bold')}
+            <TouchableOpacity 
+              style={[styles.formatButton, cardData.isUnderline && styles.formatButtonActive]} 
+              onPress={toggleUnderline}
             >
-              <Text>Bold</Text>
+              <Text style={styles.formatButtonText}>U</Text>
             </TouchableOpacity>
           </View>
-        </View>
-        {imageSource && (
-          <Image source={{ uri: '../assets/images/emoji1.png' }} style={styles.image} />
-        )}
-        <View style={styles.controlsContainer}>
+
           <View style={styles.colorPicker}>
-            <Text style={styles.label}>Background Color:</Text>
-            <TextInput
-              style={[styles.colorInput]}
-              value={backgroundColor}
-              onChangeText={handleBackgroundColorChange}
-              placeholder="white"
-            />
+            {COLORS.map((color) => (
+              <TouchableOpacity
+                key={color}
+                style={[
+                  styles.colorOption,
+                  { backgroundColor: color },
+                  cardData.backgroundColor === color && styles.colorOptionSelected
+                ]}
+                onPress={() => setCardData({ ...cardData, backgroundColor: color })}
+              />
+            ))}
           </View>
-          <View style={styles.colorPicker}>
-            <Text style={styles.label}>Text Color:</Text>
-            <TextInput
-              style={[styles.colorInput]}
-              value={textColor}
-              onChangeText={handleTextColorChange}
-              placeholder="black"
-            />
+
+          <View style={styles.decorations}>
+            {DECORATIONS.map((decoration, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.decorationButton}
+                onPress={() => addDecoration(decoration)}
+              >
+                <Text style={styles.decorationText}>{decoration}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
-          <View style={styles.sizeControl}>
-            <Text style={styles.label}>Title Size:</Text>
-            <TextInput
-              style={styles.sizeInput}
-              value={titleSize.toString()}
-              onChangeText={(text) => handleTitleSizeChange(parseInt(text))}
-              keyboardType="numeric"
-            />
-          </View>
-          <View style={styles.sizeControl}>
-            <Text style={styles.label}>Message Size:</Text>
-            <TextInput
-              style={styles.sizeInput}
-              value={messageSize.toString()}
-              onChangeText={(text) => handleMessageSizeChange(parseInt(text))}
-              keyboardType="numeric"
-            />
-          </View>
-          <TouchableOpacity style={styles.addImage} onPress={handleAddImage}>
-            <Text>Add Image</Text>
+
+          <TouchableOpacity style={styles.previewButton} onPress={handlePreview}>
+            <Text style={styles.previewButtonText}>Preview Card</Text>
           </TouchableOpacity>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+
+      {/* Floating Add Image Button */}
+      <TouchableOpacity style={styles.floatingButton} onPress={pickImage}>
+      <MaterialIcons name="add-photo-alternate" size={30} color="white" />
+      </TouchableOpacity>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
     flex: 1,
-    padding: 10,
+    backgroundColor: '#fff',
   },
-  card: {
-    backgroundColor: 'pink',
-    borderRadius: 8,
-    padding: 16,
+  loaderContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  form: {
+    padding: 20,
+    paddingBottom: 100, // Add padding for floating button
+  },
+  cardPreviewContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  cardPreview: {
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    elevation: 5,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -207,106 +247,127 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5,
-    width: '80%',
-  },
-  titleContainer: {
-    flexDirection: 'row',
+    padding: 20,
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'center',
   },
-  title: {
-    flex: 1,
-    fontSize: 24,
-    fontWeight: 'bold',
+  previewText: {
+    textAlign: 'center',
+    color: '#333',
   },
-  messageContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  message: {
-    flex: 1,
-    fontSize: 16,
-    textAlignVertical: 'top',
-    minHeight: 100,
-  },
-  titleStyleButtons: {
-    flexDirection: 'row',
-    marginLeft: 8,
-  },
-  titleStyleButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 4,
-    marginRight: 8,
-  },
-  messageStyleButtons: {
-    flexDirection: 'row',
-    marginTop: 8,
-  },
-  messageStyleButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 4,
-    marginRight: 8,
-  },
-  activeButton: {
-    backgroundColor: '#ccc',
-  },
-  image: {
-    width: '100%',
-    height: 200,
+  cardImage: {
+    width: CARD_WIDTH - 40,
+    height: (CARD_WIDTH - 40) * 0.75,
     borderRadius: 8,
-    marginVertical: 12,
+    marginBottom: 10,
   },
-  controlsContainer: {
-    marginTop: 12,
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 15,
+  },
+  messageInput: {
+    height: 100,
+    textAlignVertical: 'top',
+  },
+  picker: {
+    height: 50,
+    marginBottom: 20,
+  },
+  formattingOptions: {
+    flexDirection: 'row',
+    backgroundColor: '#ddd',
+    gap: 10,
+    marginBottom: 20,
+  },
+  formatButton: {
+    padding: 10,
+    // backgroundColor: '#ddd',
+    borderRadius: 5,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  formatButtonActive: {
+    backgroundColor: '#FF69B4',
+  },
+  formatButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   colorPicker: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 6,
+    justifyContent: 'space-around',
+    marginBottom: 20,
   },
-  label: {
-    marginRight: 12,
-    fontSize: 16,
-  },
-  colorInput: {
-    flex: 1,
+  colorOption: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 4,
-    padding: 4,
+    borderColor: '#ddd',
   },
-  sizeControl: {
+  colorOptionSelected: {
+    borderWidth: 3,
+    borderColor: '#333',
+  },
+  decorations: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 6,
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    marginBottom: 20,
   },
-  sizeInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 4,
-    padding: 4,
-    width: 60,
+  decorationButton: {
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+    margin: 5,
   },
-  addImage: {
+  decorationText: {
+    fontSize: 24,
+  },
+  decorationsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
+    position: 'absolute',
+    bottom: 10,
+  },
+  decorationPreview: {
+    fontSize: 24,
+    margin: 5,
+  },
+  previewButton: {
+    backgroundColor: '#FF69B4',
+    padding: 15,
+    borderRadius: 10,
+  },
+  previewButtonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  floatingButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#FF69B4',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginTop: 12,
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.30,
+    shadowRadius: 4.65,
   },
 });
-
-export default BirthdayCard;
