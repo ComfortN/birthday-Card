@@ -1,3 +1,4 @@
+import React = require("react");
 import { Stack } from "expo-router";
 import { View } from "react-native";
 
@@ -7,7 +8,7 @@ export default function RootLayout() {
     <Stack>
       <Stack.Screen name="index" 
       options={{
-        headerTitle: "Birthday Card Creator",
+        headerShown: false,
         }} />
       
     </Stack>
