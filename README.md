@@ -2,7 +2,8 @@
 
 ## Description
    The Birthday Card Creator is a React Native application that allows users to create custom birthday cards. Users can add and edit text, change the background color and text color, adjust the font size and style, and add images to the card.
-   Features
+   
+## Features
 
    - Create a new birthday card from scratch
    - Add a title and message to the card
